@@ -471,7 +471,7 @@ app.post("/oracle/notify", limiter, async (req, res) => {
   }
 });
 
-app.get("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
+app.post("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
   try {
     const { address: account_address } = req.query;
 
