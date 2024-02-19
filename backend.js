@@ -471,7 +471,7 @@ app.post("/oracle/notify", limiter, async (req, res) => {
   }
 });
 
-app.post("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
+app.get("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
   try {
     const { address: account_address } = req.query;
 
@@ -484,6 +484,9 @@ app.post("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
       method: "GET",
       headers: headers,
     });
+
+    console.log(response);
+    
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
