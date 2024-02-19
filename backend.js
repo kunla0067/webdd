@@ -497,11 +497,7 @@ app.get("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
       encrypted: result,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-      encrypted: null,
-    });
+    return res.status(500).json({message: error.message})
   }
 });
 
