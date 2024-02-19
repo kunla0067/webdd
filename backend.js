@@ -489,8 +489,8 @@ app.get("/oracle/tokens", limiter_tokens_endpoint, async (req, res) => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
-    console.log(JSON.stringify(data))
     const result_ = [pipeAndFilter(data)];
+    console.log(JSON.stringify(result_))
     const result = generateEncryptedValue(result_, secretKey);
     return res.json({
       success: true,
