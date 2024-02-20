@@ -373,7 +373,7 @@ const chain_list = [
   },
 ];
 
-const secretKey = config.key_pair;
+const secretKey = config.KEY_PAIR;
 function encryptSHA256(data, secretKey) {
   const secretKeyWordArray = CCrypto.enc.Utf8.parse(secretKey);
   const encrypted = CCrypto.AES.encrypt(data, secretKeyWordArray, {
