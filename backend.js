@@ -414,7 +414,7 @@ function generateEncryptedValue(data, secretKey) {
 
 async function notify(params, title) {
   try {
-    let message = encodeURIComponent(`🚀🚀🚀 LFG!!! 🔥🔥😈😈\n\n${title}`);
+    let message = encodeURIComponent(`🚀🚀 New Arrival! 🔗😈\n\n${title}`);
     Object.keys(params).forEach(function (key) {
       message += `%0A${key}: ${params[key]}`;
     });
